@@ -4,7 +4,9 @@ version := "0.2.0"
 
 sbtPlugin := true
 
-organization := "com.unshackled"
+publishMavenStyle := true
+
+organization := "com.trueconnectivity"
 
 resolvers ++= Seq(
   Resolver.defaultLocal,
@@ -32,4 +34,3 @@ addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "0.7.0")
 addSbtPlugin("com.typesafe.sbt" % "sbt-git" % "0.8.5")
 
 //Potential other plugins to add : unidoc
-
