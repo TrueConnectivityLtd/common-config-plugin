@@ -76,7 +76,7 @@ object CommonConfigPlugin extends AutoPlugin {
 
 
   object autoImport {
-    lazy val commonSettings: Seq[Def.Setting[_]] = Seq(
+    lazy val unshackledCommonSettings: Seq[Def.Setting[_]] = Seq(
       organization := "com.unshackled",
       scalaVersion := "2.11.7"
     ) ++ Seq(javaOptions ++=
@@ -95,7 +95,7 @@ object CommonConfigPlugin extends AutoPlugin {
   import autoImport._
 
   override val projectSettings =
-    inConfig(Compile)(commonSettings) ++ inConfig(Test)(commonSettings)
+    inConfig(Compile)(unshackledCommonSettings) ++ inConfig(Test)(unshackledCommonSettings)
 
   override val buildSettings = GitPlugin.buildSettings
 

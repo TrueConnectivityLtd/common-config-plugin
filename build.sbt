@@ -31,5 +31,5 @@ addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "0.7.0")
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-git" % "0.8.5")
 
-//Potential other plugins  : unidoc
+//Potential other plugins to add : unidoc
 
