@@ -6,7 +6,7 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-package com.unshackled
+package com.trueconnectivity
 
 import sbt.Keys._
 import sbt._
@@ -84,8 +84,8 @@ object CommonConfigPlugin extends AutoPlugin {
 
 
   object autoImport {
-    lazy val unshackledCommonSettings: Seq[Def.Setting[_]] = Seq(
-      organization := "com.unshackled",
+    lazy val trueconnectivityCommonSettings: Seq[Def.Setting[_]] = Seq(
+      organization := "com.trueconnectivity",
       scalaVersion := "2.11.7"
     ) ++ Seq(javaOptions ++=
       Seq("-Djava.awt.headless", "-Xmx1024m", "-XX:MaxMetaspaceSize=1024M")
@@ -103,7 +103,7 @@ object CommonConfigPlugin extends AutoPlugin {
   import autoImport._
 
   override val projectSettings =
-    inConfig(Compile)(unshackledCommonSettings) ++ inConfig(Test)(unshackledCommonSettings)
+    inConfig(Compile)(trueconnectivityCommonSettings) ++ inConfig(Test)(trueconnectivityCommonSettings)
 
   override val buildSettings = GitPlugin.buildSettings
 
