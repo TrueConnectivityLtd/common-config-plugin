@@ -10,6 +10,7 @@ package com.trueconnectivity
 
 import sbt.Keys._
 import sbt._
+import scoverage.ScoverageKeys
 
 object CommonConfigPlugin extends AutoPlugin {
 
@@ -42,10 +43,16 @@ object CommonConfigPlugin extends AutoPlugin {
 
     //Running scalastyle automatically on both compile and test
     lazy val settings = ScalastylePlugin.projectSettings ++ Seq(
-      testScalastyle := org.scalastyle.sbt.ScalastylePlugin.scalastyle.in(Test).toTask("").value,
-      compileScalastyle := org.scalastyle.sbt.ScalastylePlugin.scalastyle.in(Compile).toTask("").value,
+      testScalastyle := ScalastylePlugin.scalastyle.in(Test).toTask("").value,
+      compileScalastyle := ScalastylePlugin.scalastyle.in(Compile).toTask("").value,
       (test in Test) <<= (test in Test) dependsOn testScalastyle,
       (compile in Compile) <<= (compile in Compile) dependsOn compileScalastyle
+    )
+  }
+
+  object CommonScoverage {
+    lazy val settings = ScoverageSbtPlugin.projectSettings ++ Seq[Setting[_]](
+      ScoverageKeys.coverageEnabled := true
     )
   }
 
@@ -94,8 +101,8 @@ object CommonConfigPlugin extends AutoPlugin {
       CommonScalastyle.settings ++
       CommonDependencies.settings ++
       CommonCompile.settings ++
+      CommonScoverage.settings ++
       net.virtualvoid.sbt.graph.Plugin.graphSettings ++
-      ScoverageSbtPlugin.projectSettings ++
       GitPlugin.projectSettings
   }
 
