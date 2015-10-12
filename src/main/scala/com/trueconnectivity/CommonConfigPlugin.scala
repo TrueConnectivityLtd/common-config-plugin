@@ -51,9 +51,7 @@ object CommonConfigPlugin extends AutoPlugin {
   }
 
   object CommonScoverage {
-    lazy val settings = ScoverageSbtPlugin.projectSettings ++ Seq[Setting[_]](
-      ScoverageKeys.coverageEnabled := true
-    )
+    lazy val settings = ScoverageSbtPlugin.projectSettings   
   }
 
   object CommonDependencies {
@@ -61,8 +59,6 @@ object CommonConfigPlugin extends AutoPlugin {
     lazy val settings = Seq[Setting[_]](
 
       libraryDependencies ++= Seq(
-        "joda-time" % "joda-time" % "2.8.2",
-        "org.slf4j" % "slf4j-simple" % slf4j_version,
         "org.slf4j" % "slf4j-api" % slf4j_version,
         "com.typesafe" % "config" % "1.3.0"
       )
