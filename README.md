@@ -2,13 +2,13 @@
 
 ## Usage 
 
-Under any sbt module, in project/plugins.sbt, add the following resolver and plugin : 
+Under any sbt module, in project/plugins.sbt, add the following lines : 
 
 ```scala
 
-resolvers +="build-releases" at "http://build.cakesolutions.net/artifactory/plugins-release-local"
+lazy val root = (project in file(".")).dependsOn(commonPlugin)
 
-addSbtPlugin("com.unshackled" % "common-config-plugin" % "0.3.0")
+lazy val commonPlugin = uri("https://github.com/TrueConnectivityLtd/common-config-plugin.git")
 
 ```
 
@@ -20,7 +20,7 @@ name := "module-name"
 
 version := "0.0.1" 
 
-unshackledCommonSettings
+trueconnectivityCommonSettings
 ```
 
 This will pull common useful dependencies, set the usual scalac options, set the scala version to 2.11.7, set the organization to "com.unshackled", add several useful plugins to the project, such as a formatter and a style checker (the plugins have been pre-configured, but their configuration can be overridden in the build.sbt file). Then, in sbt, call 
