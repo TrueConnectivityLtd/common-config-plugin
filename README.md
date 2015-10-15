@@ -8,7 +8,7 @@ Under any sbt module, in project/plugins.sbt, add the following resolver and plu
 
 resolvers +="build-releases" at "http://build.cakesolutions.net/artifactory/plugins-release-local"
 
-addSbtPlugin("com.unshackled" % "common-config-plugin" % "0.2.0")
+addSbtPlugin("com.unshackled" % "common-config-plugin" % "0.3.0")
 
 ```
 
