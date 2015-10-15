@@ -8,7 +8,7 @@
 
 name := "common-config-plugin"
 
-version := "0.2.0"
+version := "0.3.0"
 
 sbtPlugin := true
 
@@ -33,7 +33,7 @@ addSbtPlugin("io.spray" % "sbt-revolver" % "0.7.1")
 
 addSbtPlugin("net.virtual-void" % "sbt-dependency-graph" % "0.7.5")
 
-addSbtPlugin("com.typesafe.sbt" % "sbt-scalariform" % "1.3.0")
+addSbtPlugin("org.scalariform" % "sbt-scalariform" % "1.5.1")
 
 addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.3.3")
 
