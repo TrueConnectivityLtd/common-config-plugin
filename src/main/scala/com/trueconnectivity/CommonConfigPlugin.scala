@@ -89,7 +89,7 @@ object CommonConfigPlugin extends AutoPlugin {
   object autoImport {
     lazy val trueconnectivityCommonSettings: Seq[Def.Setting[_]] = Seq(
       organization := "com.trueconnectivity",
-      scalaVersion := "2.11.7"
+      scalaVersion := "2.11.12"
     ) ++ Seq(javaOptions ++=
       Seq("-Djava.awt.headless", "-Xmx1024m", "-XX:MaxMetaspaceSize=1024M")
     ) ++ Revolver.settings ++
