@@ -8,8 +8,6 @@
 
 name := "common-config-plugin"
 
-version := "0.5.0"
-
 sbtPlugin := true
 
 enablePlugins(SbtPlugin)
