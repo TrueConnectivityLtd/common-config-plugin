@@ -20,7 +20,10 @@ pipeline {
             }
         }
         stage('Publish Snapshot') {
-            when { not { branch 'develop' } }  
+            when { not { branch 'develop' } }
+            steps {
+
+            } 
         }
         stage('Publish') {
             when { branch 'develop' }
