@@ -147,7 +147,7 @@ object CommonConfigPlugin extends AutoPlugin {
       CommonDependencies.settings ++
       CommonCompile.settings ++
       CommonScoverage.settings ++
-      net.virtualvoid.sbt.graph.Plugin.graphSettings ++
+      net.virtualvoid.sbt.graph.DependencyGraphPlugin.projectSettings ++
       GitPlugin.projectSettings
   }
 
@@ -159,46 +159,3 @@ object CommonConfigPlugin extends AutoPlugin {
 
   override val buildSettings = GitPlugin.buildSettings ++ CommonScalaFmt.buildSettings
 }
-
-
-/**
- * Symbolic link helper methods.
- */
-object SymLink {
-  def isSymLinkDirectory(dir: File): Boolean = dir.exists && dir.isDirectory && isSymLink(dir)
-
-  def isSymLink(file: File): Boolean = file.exists && {
-    val f = new File(file.getParentFile.getCanonicalFile, file.getName)
-    f.getCanonicalPath != f.getAbsoluteFile.getPath
-  }
-}
-
-/**
- * Class that uses all the symlinks present in the root folder of an sbt project and consider them as potential
- * sbt sub-projects.
- * @param id : the id/name of the root project.
- */
-class CrossProjectBuild(id: String) extends Build {
-
-  def findSymLinkedProjectFiles(cwd: File = file(".")): Seq[File] = {
-    val currentSymLinkProjects = cwd.listFiles.filter(SymLink.isSymLinkDirectory)
-    val allSymLinkProjects = for {
-      dir <- currentSymLinkProjects
-      symLinksUnderDir = findSymLinkedProjectFiles(dir)
-    } yield (dir, symLinksUnderDir)
-
-    val maybeUs = allSymLinkProjects.collectFirst {
-      case (dir, symLinks) if dir.getName == id => symLinks.map(f => file(f.getName))
-    }
-    maybeUs getOrElse currentSymLinkProjects
-  }
-
-  lazy val symLinkedProjects = findSymLinkedProjectFiles().map(sp => RootProject(sp): ClasspathDep[ProjectReference])
-  lazy val proj = Project(id = id, base = file("."), dependencies = symLinkedProjects)
-    .settings(name := id)
-    .settings(
-      CommonConfigPlugin.projectSettings: _*
-    )
-
-}
-
