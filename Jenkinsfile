@@ -25,7 +25,7 @@ pipeline {
                 sh '''
                     branch_quoted="${BRANCH_NAME/\\//}"
                     BUILD_VERSION=$BUILD_NUMBER-$branch_quoted
-                    sbt "set version in ThisBuild := \"\"$BUILD_VERSION\"\"" publish 
+                    sbt 'set version in ThisBuild := \"$BUILD_VERSION\"\"' publish 
                 '''
             } 
         }
