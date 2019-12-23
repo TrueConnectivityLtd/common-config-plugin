@@ -24,8 +24,9 @@ pipeline {
             steps {
                 sh '''
                     branch_quoted="${BRANCH_NAME/\\//}"
-                    BUILD_VERSION=\"$BUILD_NUMBER-$branch_quoted\"
-                    sbt "set version in ThisBuild := $BUILD_VERSION" publish
+                    BUILD_VERSION=$BUILD_NUMBER-$branch_quoted
+                    sed -i -e "s/\\"$/.$BUILD_VERSION\\"/" version.sbt 
+                    sbt publish
                 '''
             } 
         }
