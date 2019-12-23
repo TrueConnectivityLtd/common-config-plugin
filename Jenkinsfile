@@ -22,7 +22,7 @@ pipeline {
         stage('Publish Snapshot') {
             when { not { branch 'develop' } }
             steps {
-                sh """export VERSION=${env.GIT_BRANCH//\//-}-${env.GIT_COMMIT:0:8}
+                sh """export VERSION=${env.GIT_BRANCH//\//-}-${env.GIT_COMMIT}
                       sbt "set version in ThisBuild := \"$VERSION\"" publish 
                 """
             }   
