@@ -26,7 +26,7 @@ pipeline {
                     branch_quoted="${BRANCH_NAME/\\//}"
                     BUILD_VERSION=$BUILD_NUMBER-$branch_quoted
                     sed -i -e "s/\\"$/.$BUILD_VERSION\\"/" version.sbt 
-                    sbt publish
+                    sbt +publish
                 '''
             } 
         }
