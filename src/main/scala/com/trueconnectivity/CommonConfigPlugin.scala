@@ -21,21 +21,6 @@ object CommonConfigPlugin extends AutoPlugin {
   import scoverage.ScoverageSbtPlugin
   import org.scalastyle.sbt.ScalastylePlugin
 
-  object CommonScalariform {
-    lazy val settings = SbtScalariform.scalariformSettings ++ Seq(
-      ScalariformKeys.preferences in Compile := formattingPreferences,
-      ScalariformKeys.preferences in Test := formattingPreferences
-    )
-
-    import scalariform.formatter.preferences._
-
-    def formattingPreferences =
-      FormattingPreferences()
-        .setPreference(RewriteArrowSymbols, true)
-        .setPreference(AlignParameters, true)
-        .setPreference(AlignSingleLineCaseStatements, true)
-        .setPreference(DoubleIndentClassDeclaration, true)
-  }
 
   object CommonScalastyle {
     lazy val testScalastyle = taskKey[Unit]("testScalastyle")
@@ -87,13 +72,25 @@ object CommonConfigPlugin extends AutoPlugin {
 
 
   object autoImport {
+
+    val generateConfig = SettingKey[Unit]("scalafmtGenerateConfig")
+
+    val validate: TaskKey[Unit] =
+      taskKey[Unit](
+        "Validates the formatting and linting"
+      )
+
+    val format: TaskKey[Unit] =
+      taskKey[Unit](
+        "Format of the codes"
+      )
+
     lazy val trueconnectivityCommonSettings: Seq[Def.Setting[_]] = Seq(
       organization := "com.trueconnectivity",
-      scalaVersion := "2.11.12"
+      scalaVersion := "2.12.10"
     ) ++ Seq(javaOptions ++=
       Seq("-Djava.awt.headless", "-Xmx1024m", "-XX:MaxMetaspaceSize=1024M")
     ) ++ Revolver.settings ++
-      CommonScalariform.settings ++
       CommonScalastyle.settings ++
       CommonDependencies.settings ++
       CommonCompile.settings ++
@@ -108,8 +105,36 @@ object CommonConfigPlugin extends AutoPlugin {
   override val projectSettings =
     inConfig(Compile)(trueconnectivityCommonSettings) ++ inConfig(Test)(trueconnectivityCommonSettings)
 
-  override val buildSettings = GitPlugin.buildSettings
-
+  override val buildSettings = GitPlugin.buildSettings ++ SettingKey[Unit]("scalafmtGenerateConfig") :=
+  IO.write(
+      // writes to file once when build is loaded
+      file(".scalafmt.conf"),
+      """version = 2.2.1
+      |style = defaultWithAlign
+      |maxColumn = 100
+      |project {
+      |  git = true
+      |}
+      |align {
+      |  openParenCallSite = false
+      |  openParenDefnSite = false
+      |}
+      |binPack {
+      |  parentConstructors = true
+      |}
+      |
+      |continuationIndent {
+      |  callSite = 2
+      |  defnSite = 4
+      |}
+      |
+      |danglingParentheses = true
+      |
+      |rewrite.rules = [RedundantBraces, RedundantParens, PreferCurlyFors]
+      |
+      |align.openParenCallSite = false
+      """.stripMargin.getBytes("UTF-8")
+    )
 }
 
 
