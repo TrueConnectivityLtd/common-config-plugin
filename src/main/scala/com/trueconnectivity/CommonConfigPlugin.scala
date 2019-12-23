@@ -14,24 +14,25 @@ import scoverage.ScoverageKeys
 
 object CommonConfigPlugin extends AutoPlugin {
 
-  import com.typesafe.sbt.SbtScalariform
-  import com.typesafe.sbt.SbtScalariform.ScalariformKeys
-  import spray.revolver.RevolverPlugin._
+  import spray.revolver.RevolverPlugin.autoImport._
   import com.typesafe.sbt.GitPlugin
   import scoverage.ScoverageSbtPlugin
   import org.scalastyle.sbt.ScalastylePlugin
-
+  import ScalastylePlugin.autoImport._
+  import org.scalafmt.sbt.ScalafmtPlugin
+  import ScalafmtPlugin.autoImport._
 
   object CommonScalastyle {
+
     lazy val testScalastyle = taskKey[Unit]("testScalastyle")
     lazy val compileScalastyle = taskKey[Unit]("compileScalastyle")
 
     //Running scalastyle automatically on both compile and test
     lazy val settings = ScalastylePlugin.projectSettings ++ Seq(
-      testScalastyle := ScalastylePlugin.scalastyle.in(Test).toTask("").value,
-      compileScalastyle := ScalastylePlugin.scalastyle.in(Compile).toTask("").value,
-      (test in Test) <<= (test in Test) dependsOn testScalastyle,
-      (compile in Compile) <<= (compile in Compile) dependsOn compileScalastyle
+      testScalastyle := scalastyle.in(Test).toTask("").value,
+      compileScalastyle := scalastyle.in(Compile).toTask("").value,
+      (test in Test) := ((test in Test) dependsOn testScalastyle).value,
+      (compile in Compile) := ((compile in Compile) dependsOn compileScalastyle).value
     )
   }
 
@@ -70,10 +71,61 @@ object CommonConfigPlugin extends AutoPlugin {
     )
   }
 
+  object CommonScalaFmt {
 
-  object autoImport {
+    import autoImport._
 
     val generateConfig = SettingKey[Unit]("scalafmtGenerateConfig")
+
+    lazy val buildSettings = SettingKey[Unit]("scalafmtGenerateConfig") :=
+    IO.write(
+        // writes to file once when build is loaded
+        file(".scalafmt.conf"),
+        """
+        |version = 2.2.1
+        |style = defaultWithAlign
+        |maxColumn = 100
+        |project {
+        |  git = true
+        |}
+        |align {
+        |  openParenCallSite = false
+        |  openParenDefnSite = false
+        |}
+        |binPack {
+        |  parentConstructors = true
+        |}
+        |
+        |continuationIndent {
+        |  callSite = 2
+        |  defnSite = 4
+        |}
+        |
+        |danglingParentheses = true
+        |
+        |rewrite.rules = [RedundantBraces, RedundantParens, PreferCurlyFors]
+        |
+        |align.openParenCallSite = false
+        """.stripMargin.getBytes("UTF-8")
+      )
+
+    lazy val formattingTasksSettings = Seq[Setting[_]](validate := Def
+    .sequential(
+      (scalastyle in Compile).toTask(""),
+      scalafmtCheckAll,
+      scalafmtSbtCheck in Compile
+      //           scapegoat
+    )
+    .value,
+  format := Def
+    .sequential(
+      scalafmtAll,
+      scalafmtSbt in Compile
+    )
+    .value)
+  }
+
+  object autoImport {
 
     val validate: TaskKey[Unit] =
       taskKey[Unit](
@@ -102,39 +154,10 @@ object CommonConfigPlugin extends AutoPlugin {
   // a group of settings that are automatically added to projects.
   import autoImport._
 
-  override val projectSettings =
+  override val projectSettings = CommonScalaFmt.formattingTasksSettings ++
     inConfig(Compile)(trueconnectivityCommonSettings) ++ inConfig(Test)(trueconnectivityCommonSettings)
 
-  override val buildSettings = GitPlugin.buildSettings ++ SettingKey[Unit]("scalafmtGenerateConfig") :=
-  IO.write(
-      // writes to file once when build is loaded
-      file(".scalafmt.conf"),
-      """version = 2.2.1
-      |style = defaultWithAlign
-      |maxColumn = 100
-      |project {
-      |  git = true
-      |}
-      |align {
-      |  openParenCallSite = false
-      |  openParenDefnSite = false
-      |}
-      |binPack {
-      |  parentConstructors = true
-      |}
-      |
-      |continuationIndent {
-      |  callSite = 2
-      |  defnSite = 4
-      |}
-      |
-      |danglingParentheses = true
-      |
-      |rewrite.rules = [RedundantBraces, RedundantParens, PreferCurlyFors]
-      |
-      |align.openParenCallSite = false
-      """.stripMargin.getBytes("UTF-8")
-    )
+  override val buildSettings = GitPlugin.buildSettings ++ CommonScalaFmt.buildSettings
 }
 
 
