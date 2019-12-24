@@ -90,7 +90,7 @@ object CommonConfigPlugin extends AutoPlugin {
         )
         IO.write(
           file(styleConfFile),
-          IO.readBytes(getClass.getClassLoader().getResourceAsStream("scalastyle-config.conf"))
+          IO.readBytes(getClass.getClassLoader().getResourceAsStream(styleConfFile))
         )
       },
       validate := Def
