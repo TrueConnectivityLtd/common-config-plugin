@@ -11,6 +11,7 @@ package com.trueconnectivity
 import sbt.Keys._
 import sbt._
 import scoverage.ScoverageKeys
+import scala.util.Try
 
 object CommonConfigPlugin extends AutoPlugin {
 
@@ -22,9 +23,13 @@ object CommonConfigPlugin extends AutoPlugin {
   import org.scalafmt.sbt.ScalafmtPlugin
   import ScalafmtPlugin.autoImport._
 
+  override def requires: Plugins = empty
+
+  override def trigger: PluginTrigger = allRequirements
+
   object CommonScalastyle {
 
-    lazy val testScalastyle = taskKey[Unit]("testScalastyle")
+    lazy val testScalastyle    = taskKey[Unit]("testScalastyle")
     lazy val compileScalastyle = taskKey[Unit]("compileScalastyle")
 
     //Running scalastyle automatically on both compile and test
@@ -37,16 +42,15 @@ object CommonConfigPlugin extends AutoPlugin {
   }
 
   object CommonScoverage {
-    lazy val settings = ScoverageSbtPlugin.projectSettings   
+    lazy val settings = ScoverageSbtPlugin.projectSettings
   }
 
   object CommonDependencies {
     val slf4j_version = "1.6.1"
     lazy val settings = Seq[Setting[_]](
-
       libraryDependencies ++= Seq(
-        "org.slf4j" % "slf4j-api" % slf4j_version,
-        "com.typesafe" % "config" % "1.3.0"
+        "org.slf4j"    % "slf4j-api" % slf4j_version,
+        "com.typesafe" % "config"    % "1.3.0"
       )
     )
   }
@@ -75,57 +79,41 @@ object CommonConfigPlugin extends AutoPlugin {
 
     import autoImport._
 
-    val generateConfig = SettingKey[Unit]("scalafmtGenerateConfig")
+    private val sfmtConfFile  = "scalafmt.conf"
+    private val styleConfFile = "scalastyle-config.xml"
 
-    lazy val buildSettings = SettingKey[Unit]("scalafmtGenerateConfig") :=
-    IO.write(
-        // writes to file once when build is loaded
-        file(".scalafmt.conf"),
-        """
-        |version = 2.2.1
-        |style = defaultWithAlign
-        |maxColumn = 100
-        |project {
-        |  git = true
-        |}
-        |align {
-        |  openParenCallSite = false
-        |  openParenDefnSite = false
-        |}
-        |binPack {
-        |  parentConstructors = true
-        |}
-        |
-        |continuationIndent {
-        |  callSite = 2
-        |  defnSite = 4
-        |}
-        |
-        |danglingParentheses = true
-        |
-        |rewrite.rules = [RedundantBraces, RedundantParens, PreferCurlyFors]
-        |
-        |align.openParenCallSite = false
-        """.stripMargin.getBytes("UTF-8")
-      )
-
-    lazy val formattingTasksSettings = Seq[Setting[_]](validate := Def
-    .sequential(
-      (scalastyle in Compile).toTask(""),
-      scalafmtCheckAll,
-      scalafmtSbtCheck in Compile
-      //           scapegoat
+    lazy val formattingTasksSettings = Seq[Setting[_]](
+      generateConfigs := {
+        IO.write(
+          file(s".$sfmtConfFile"),
+          IO.readBytes(getClass.getClassLoader().getResourceAsStream(sfmtConfFile))
+        )
+        IO.write(
+          file(styleConfFile),
+          IO.readBytes(getClass.getClassLoader().getResourceAsStream("scalastyle-config.conf"))
+        )
+      },
+      validate := Def
+        .sequential(
+          (scalastyle in Compile).toTask(""),
+          scalafmtCheckAll,
+          scalafmtSbtCheck in Compile
+        )
+        .value,
+      format := Def
+        .sequential(
+          scalafmtAll,
+          scalafmtSbt in Compile
+        )
+        .value
     )
-    .value,
-  format := Def
-    .sequential(
-      scalafmtAll,
-      scalafmtSbt in Compile
-    )
-    .value)
   }
 
   object autoImport {
+
+    val generateConfigs: TaskKey[Unit] = taskKey[Unit](
+      "Generates Lint & Formatting Configs"
+    )
 
     val validate: TaskKey[Unit] =
       taskKey[Unit](
@@ -140,9 +128,8 @@ object CommonConfigPlugin extends AutoPlugin {
     lazy val trueconnectivityCommonSettings: Seq[Def.Setting[_]] = Seq(
       organization := "com.trueconnectivity",
       scalaVersion := "2.12.10"
-    ) ++ Seq(javaOptions ++=
-      Seq("-Djava.awt.headless", "-Xmx1024m", "-XX:MaxMetaspaceSize=1024M")
-    ) ++ Revolver.settings ++
+    ) ++
+      Revolver.settings ++
       CommonScalastyle.settings ++
       CommonDependencies.settings ++
       CommonCompile.settings ++
@@ -154,8 +141,9 @@ object CommonConfigPlugin extends AutoPlugin {
   // a group of settings that are automatically added to projects.
   import autoImport._
 
-  override val projectSettings = CommonScalaFmt.formattingTasksSettings ++
-    inConfig(Compile)(trueconnectivityCommonSettings) ++ inConfig(Test)(trueconnectivityCommonSettings)
+  override val projectSettings = Seq(Compile, Test).flatMap(
+    inConfig(_)(trueconnectivityCommonSettings)
+  ) ++ CommonScalaFmt.formattingTasksSettings
 
-  override val buildSettings = GitPlugin.buildSettings ++ CommonScalaFmt.buildSettings
+  override val buildSettings = GitPlugin.buildSettings
 }

@@ -9,13 +9,13 @@ pipeline {
     stages {
         stage('Install Dependencies') {
             steps {
-                sh 'sbt +update'
+                sh 'sbt update'
             }
         }
         stage('Build & Test') {
             steps {
                 sh '''
-                    sbt +test
+                    sbt test
                 '''
             }
         }
@@ -26,14 +26,14 @@ pipeline {
                     branch_quoted="${BRANCH_NAME/\\//}"
                     BUILD_VERSION=$BUILD_NUMBER-$branch_quoted
                     sed -i -e "s/\\"$/.$BUILD_VERSION\\"/" version.sbt 
-                    sbt +publish
+                    sbt publish
                 '''
             } 
         }
         stage('Publish') {
             when { branch 'develop' }
             steps {
-                sh 'sbt "+release with-defaults"'
+                sh 'sbt "release with-defaults"'
             }
         }
     }
