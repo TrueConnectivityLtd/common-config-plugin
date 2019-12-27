@@ -33,7 +33,10 @@ pipeline {
         stage('Publish') {
             when { branch 'develop' }
             steps {
-                sh 'sbt "release with-defaults"'
+                sh '''
+                    git checkout develop ${BRANCH_NAME}
+                    sbt "release with-defaults
+                '''
             }
         }
     }
