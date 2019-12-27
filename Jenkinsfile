@@ -35,7 +35,7 @@ pipeline {
             steps {
                 sh '''
                     git checkout ${BRANCH_NAME}
-                    sbt "release with-defaults
+                    sbt "release with-defaults"
                 '''
             }
         }
