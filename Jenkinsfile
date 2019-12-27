@@ -34,7 +34,7 @@ pipeline {
             when { branch 'develop' }
             steps {
                 sh '''
-                    git checkout develop ${BRANCH_NAME}
+                    git checkout ${BRANCH_NAME}
                     sbt "release with-defaults
                 '''
             }
