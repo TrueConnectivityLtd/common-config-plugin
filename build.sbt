@@ -8,11 +8,14 @@
 
 name := "common-config-plugin"
 
-version := "0.4.0"
-
 sbtPlugin := true
 
-publishMavenStyle := true
+enablePlugins(SbtPlugin)
+
+ivyLoggingLevel := UpdateLogging.Quiet
+scalacOptions in Compile ++= Seq("-feature", "-deprecation")
+
+releaseVersionBump := sbtrelease.Version.Bump.Bugfix
 
 organization := "com.trueconnectivity"
 
@@ -27,18 +30,26 @@ resolvers ++= Seq(
   "jgit-repo" at "http://download.eclipse.org/jgit/maven"
 )
 
-addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.14.0")
+addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.14.10")
 
-addSbtPlugin("io.spray" % "sbt-revolver" % "0.7.1")
+addSbtPlugin("io.spray" % "sbt-revolver" % "0.9.0")
 
-addSbtPlugin("net.virtual-void" % "sbt-dependency-graph" % "0.7.5")
+addSbtPlugin("net.virtual-void" % "sbt-dependency-graph" % "0.10.0-RC1")
 
-addSbtPlugin("org.scalariform" % "sbt-scalariform" % "1.5.1")
+addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.6.1")
 
-addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.3.3")
+addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "1.0.0")
 
-addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "0.7.0")
+addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.2.1")
 
-addSbtPlugin("com.typesafe.sbt" % "sbt-git" % "0.8.5")
+addSbtPlugin("com.typesafe.sbt" % "sbt-git" % "1.0.0")
+
+publishMavenStyle := true
+publishArtifact in Test := false
+pomIncludeRepository := { _ =>
+  false
+}
+
+addCommandAlias("format", "; scalafmt ; test:scalafmt ; scalafmtSbt")
 
 //Potential other plugins to add : unidoc

@@ -11,56 +11,46 @@ package com.trueconnectivity
 import sbt.Keys._
 import sbt._
 import scoverage.ScoverageKeys
+import scala.util.Try
 
 object CommonConfigPlugin extends AutoPlugin {
 
-  import com.typesafe.sbt.SbtScalariform
-  import com.typesafe.sbt.SbtScalariform.ScalariformKeys
-  import spray.revolver.RevolverPlugin._
+  import spray.revolver.RevolverPlugin.autoImport._
   import com.typesafe.sbt.GitPlugin
   import scoverage.ScoverageSbtPlugin
   import org.scalastyle.sbt.ScalastylePlugin
+  import ScalastylePlugin.autoImport._
+  import org.scalafmt.sbt.ScalafmtPlugin
+  import ScalafmtPlugin.autoImport._
 
-  object CommonScalariform {
-    lazy val settings = SbtScalariform.scalariformSettings ++ Seq(
-      ScalariformKeys.preferences in Compile := formattingPreferences,
-      ScalariformKeys.preferences in Test := formattingPreferences
-    )
+  override def requires: Plugins = empty
 
-    import scalariform.formatter.preferences._
-
-    def formattingPreferences =
-      FormattingPreferences()
-        .setPreference(RewriteArrowSymbols, true)
-        .setPreference(AlignParameters, true)
-        .setPreference(AlignSingleLineCaseStatements, true)
-        .setPreference(DoubleIndentClassDeclaration, true)
-  }
+  override def trigger: PluginTrigger = allRequirements
 
   object CommonScalastyle {
-    lazy val testScalastyle = taskKey[Unit]("testScalastyle")
+
+    lazy val testScalastyle    = taskKey[Unit]("testScalastyle")
     lazy val compileScalastyle = taskKey[Unit]("compileScalastyle")
 
     //Running scalastyle automatically on both compile and test
     lazy val settings = ScalastylePlugin.projectSettings ++ Seq(
-      testScalastyle := ScalastylePlugin.scalastyle.in(Test).toTask("").value,
-      compileScalastyle := ScalastylePlugin.scalastyle.in(Compile).toTask("").value,
-      (test in Test) <<= (test in Test) dependsOn testScalastyle,
-      (compile in Compile) <<= (compile in Compile) dependsOn compileScalastyle
+      testScalastyle := scalastyle.in(Test).toTask("").value,
+      compileScalastyle := scalastyle.in(Compile).toTask("").value,
+      (test in Test) := ((test in Test) dependsOn testScalastyle).value,
+      (compile in Compile) := ((compile in Compile) dependsOn compileScalastyle).value
     )
   }
 
   object CommonScoverage {
-    lazy val settings = ScoverageSbtPlugin.projectSettings   
+    lazy val settings = ScoverageSbtPlugin.projectSettings
   }
 
   object CommonDependencies {
     val slf4j_version = "1.6.1"
     lazy val settings = Seq[Setting[_]](
-
       libraryDependencies ++= Seq(
-        "org.slf4j" % "slf4j-api" % slf4j_version,
-        "com.typesafe" % "config" % "1.3.0"
+        "org.slf4j"    % "slf4j-api" % slf4j_version,
+        "com.typesafe" % "config"    % "1.3.0"
       )
     )
   }
@@ -85,72 +75,75 @@ object CommonConfigPlugin extends AutoPlugin {
     )
   }
 
+  object CommonScalaFmt {
+
+    import autoImport._
+
+    private val sfmtConfFile  = "scalafmt.conf"
+    private val styleConfFile = "scalastyle-config.xml"
+
+    lazy val formattingTasksSettings = Seq[Setting[_]](
+      generateConfigs := {
+        IO.write(
+          file(s".$sfmtConfFile"),
+          IO.readBytes(getClass.getClassLoader().getResourceAsStream(sfmtConfFile))
+        )
+        IO.write(
+          file(styleConfFile),
+          IO.readBytes(getClass.getClassLoader().getResourceAsStream(styleConfFile))
+        )
+      },
+      validate := Def
+        .sequential(
+          (scalastyle in Compile).toTask(""),
+          scalafmtCheckAll,
+          scalafmtSbtCheck in Compile
+        )
+        .value,
+      format := Def
+        .sequential(
+          scalafmtAll,
+          scalafmtSbt in Compile
+        )
+        .value
+    )
+  }
 
   object autoImport {
+
+    val generateConfigs: TaskKey[Unit] = taskKey[Unit](
+      "Generates Lint & Formatting Configs"
+    )
+
+    val validate: TaskKey[Unit] =
+      taskKey[Unit](
+        "Validates the formatting and linting"
+      )
+
+    val format: TaskKey[Unit] =
+      taskKey[Unit](
+        "Format of the codes"
+      )
+
     lazy val trueconnectivityCommonSettings: Seq[Def.Setting[_]] = Seq(
       organization := "com.trueconnectivity",
-      scalaVersion := "2.11.12"
-    ) ++ Seq(javaOptions ++=
-      Seq("-Djava.awt.headless", "-Xmx1024m", "-XX:MaxMetaspaceSize=1024M")
-    ) ++ Revolver.settings ++
-      CommonScalariform.settings ++
+      scalaVersion := "2.12.10"
+    ) ++
+      Revolver.settings ++
       CommonScalastyle.settings ++
       CommonDependencies.settings ++
       CommonCompile.settings ++
       CommonScoverage.settings ++
-      net.virtualvoid.sbt.graph.Plugin.graphSettings ++
+      net.virtualvoid.sbt.graph.DependencyGraphPlugin.projectSettings ++
       GitPlugin.projectSettings
   }
 
   // a group of settings that are automatically added to projects.
   import autoImport._
 
-  override val projectSettings =
-    inConfig(Compile)(trueconnectivityCommonSettings) ++ inConfig(Test)(trueconnectivityCommonSettings)
+  override val projectSettings = Seq(Compile, Test).flatMap(
+    inConfig(_)(trueconnectivityCommonSettings)
+  ) ++ CommonScalaFmt.formattingTasksSettings
 
   override val buildSettings = GitPlugin.buildSettings
-
 }
-
-
-/**
- * Symbolic link helper methods.
- */
-object SymLink {
-  def isSymLinkDirectory(dir: File): Boolean = dir.exists && dir.isDirectory && isSymLink(dir)
-
-  def isSymLink(file: File): Boolean = file.exists && {
-    val f = new File(file.getParentFile.getCanonicalFile, file.getName)
-    f.getCanonicalPath != f.getAbsoluteFile.getPath
-  }
-}
-
-/**
- * Class that uses all the symlinks present in the root folder of an sbt project and consider them as potential
- * sbt sub-projects.
- * @param id : the id/name of the root project.
- */
-class CrossProjectBuild(id: String) extends Build {
-
-  def findSymLinkedProjectFiles(cwd: File = file(".")): Seq[File] = {
-    val currentSymLinkProjects = cwd.listFiles.filter(SymLink.isSymLinkDirectory)
-    val allSymLinkProjects = for {
-      dir <- currentSymLinkProjects
-      symLinksUnderDir = findSymLinkedProjectFiles(dir)
-    } yield (dir, symLinksUnderDir)
-
-    val maybeUs = allSymLinkProjects.collectFirst {
-      case (dir, symLinks) if dir.getName == id => symLinks.map(f => file(f.getName))
-    }
-    maybeUs getOrElse currentSymLinkProjects
-  }
-
-  lazy val symLinkedProjects = findSymLinkedProjectFiles().map(sp => RootProject(sp): ClasspathDep[ProjectReference])
-  lazy val proj = Project(id = id, base = file("."), dependencies = symLinkedProjects)
-    .settings(name := id)
-    .settings(
-      CommonConfigPlugin.projectSettings: _*
-    )
-
-}
-
