@@ -35,6 +35,7 @@ pipeline {
             steps {
                 sh '''
                     git checkout ${BRANCH_NAME}
+                    git pull --force
                     sbt "release with-defaults"
                 '''
             }
