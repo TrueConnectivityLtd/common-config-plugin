@@ -28,7 +28,7 @@ pipeline {
                 // TODO move this to library
                 sh '''
                     pwd
-                    echo $ARTIFACTORY
+                    cp $ARTIFACTORY publishSettings.sbt
                 '''
                 sh '''
                     branch_quoted="${BRANCH_NAME/\\//}"
@@ -60,7 +60,10 @@ pipeline {
     post {
         always {
             script {
-                sh 'sh "git config --local --remove-section credential"'
+                sh '
+                  rm publishSettings.sbt
+                  git config --local --remove-section credential
+                '
             }
         }
     }
