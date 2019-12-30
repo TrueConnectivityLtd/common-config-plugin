@@ -27,7 +27,6 @@ pipeline {
             steps {
                 sh '''
                     cp $ARTIFACTORY publishSettings.sbt
-                    cat publishSettings.sbt
                     branch_quoted="${BRANCH_NAME/\\//}"
                     BUILD_VERSION=$BUILD_NUMBER-$branch_quoted
                     sed -i -e "s/\\"$/.$BUILD_VERSION\\"/" version.sbt 
@@ -56,8 +55,8 @@ pipeline {
         always {
             script {
                 sh '''
-                  rm publishSettings.sbt
-                  rm .git-credential
+                  rm -f publishSettings.sbt
+                  rm -f .git-credentials
                 '''
             }
         }
