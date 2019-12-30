@@ -21,7 +21,15 @@ pipeline {
         }
         stage('Publish Snapshot') {
             when { not { branch 'develop' } }
+            environment {
+                ARTIFACTORY = credentials('publishSettings.sbt')
+            }
             steps {
+                // TODO move this to library
+                sh '''
+                    pwd
+                    echo $ARTIFACTORY
+                '''
                 sh '''
                     branch_quoted="${BRANCH_NAME/\\//}"
                     BUILD_VERSION=$BUILD_NUMBER-$branch_quoted
@@ -32,12 +40,26 @@ pipeline {
         }
         stage('Publish') {
             when { branch 'develop' }
+            environment {
+                ARTIFACTORY = credentials('publishSettings.sbt')
+            }
             steps {
                 sh '''
-                    git checkout ${BRANCH_NAME}
-                    git pull --force
+                    pwd
+                    echo $ARTIFACTORY
+                '''
+                sh '''
+                    ./gitconfig.sh
                     sbt "release with-defaults"
                 '''
+            }
+        }
+    }
+
+    post {
+        always {
+            script {
+                sh 'sh "git config --local --remove-section credential"'
             }
         }
     }
