@@ -1,3 +1,12 @@
+private boolean lastCommitIsBumpCommit() {
+    lastCommit = sh([script: 'git log -1', returnStdout: true])
+    if (lastCommit.contains("Setting version to")) {
+        return true
+    } else {
+        return false
+    }
+}
+
 pipeline {
     agent any
 
@@ -7,10 +16,14 @@ pipeline {
     }
 
     stages {
-        stage('Install Dependencies') {
-            steps {
-                sh 'sbt update'
-            }
+        stage('Checkout') {
+            checkout scm
+            script {
+                if (lastCommitIsBumpCommit()) {
+                    currentBuild.result = 'ABORTED'
+                    error('Last commit bumped the version, aborting the build to prevent a loop.')
+                }
+            }    
         }
         stage('Build & Test') {
             steps {
