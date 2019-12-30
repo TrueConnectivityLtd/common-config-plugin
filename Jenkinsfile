@@ -60,10 +60,10 @@ pipeline {
     post {
         always {
             script {
-                sh '
+                sh '''
                   rm publishSettings.sbt
                   git config --local --remove-section credential
-                '
+                '''
             }
         }
     }
