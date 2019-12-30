@@ -11,6 +11,10 @@ lib_managed/
 src_managed/
 project/boot/
 project/plugins/project/
+publishSettings.sbt
+
+# git specific
+.git-credentials
 
 # Scala-IDE specific
 .scala_dependencies
