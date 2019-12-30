@@ -42,6 +42,8 @@ pipeline {
             }
             steps {
                 sh '''
+                    git checkout ${BRANCH_NAME}
+                    git pull --force
                     cp $ARTIFACTORY publishSettings.sbt
                     echo "https://${GITHUB_USR}:${GITHUB_PSW}@github.com"> .git-credentials
                     git config --local credential.username $GITHUB_USR
