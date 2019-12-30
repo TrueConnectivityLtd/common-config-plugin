@@ -22,7 +22,7 @@ pipeline {
         stage('Publish Snapshot') {
             when { not { branch 'develop' } }
             environment {
-                ARTIFACTORY = credentials('publishSettings.sbt')
+                ARTIFACTORY = credentials('artifactory')
             }
             steps {
                 // TODO move this to library
@@ -41,7 +41,8 @@ pipeline {
         stage('Publish') {
             when { branch 'develop' }
             environment {
-                ARTIFACTORY = credentials('publishSettings.sbt')
+                ARTIFACTORY = credentials('artifactory')
+                GITHUB = credentials('')
             }
             steps {
                 sh '''
