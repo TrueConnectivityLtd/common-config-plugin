@@ -17,13 +17,15 @@ pipeline {
 
     stages {
         stage('Checkout') {
+           steps { 
             checkout scm
             script {
                 if (lastCommitIsBumpCommit()) {
                     currentBuild.result = 'ABORTED'
                     error('Last commit bumped the version, aborting the build to prevent a loop.')
                 }
-            }    
+            }
+           } 
         }
         stage('Build & Test') {
             steps {
