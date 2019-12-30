@@ -25,12 +25,9 @@ pipeline {
                 ARTIFACTORY = credentials('artifactory')
             }
             steps {
-                // TODO move this to library
                 sh '''
-                    pwd
                     cp $ARTIFACTORY publishSettings.sbt
-                '''
-                sh '''
+                    cat publishSettings.sbt
                     branch_quoted="${BRANCH_NAME/\\//}"
                     BUILD_VERSION=$BUILD_NUMBER-$branch_quoted
                     sed -i -e "s/\\"$/.$BUILD_VERSION\\"/" version.sbt 
@@ -42,14 +39,12 @@ pipeline {
             when { branch 'develop' }
             environment {
                 ARTIFACTORY = credentials('artifactory')
-                GITHUB = credentials('')
+                GITHUB = credentials('abff7286-8319-4696-be99-fcd161ffd78f')
             }
             steps {
                 sh '''
-                    pwd
-                    echo $ARTIFACTORY
-                '''
-                sh '''
+                    cp $ARTIFACTORY publishSettings.sbt
+                    echo "https://${GITHUB_USR}:${GITHUB_PSW}@github.com"> .git-credentials
                     ./gitconfig.sh
                     sbt "release with-defaults"
                 '''
@@ -62,7 +57,7 @@ pipeline {
             script {
                 sh '''
                   rm publishSettings.sbt
-                  git config --local --remove-section credential
+                  rm .git-credential
                 '''
             }
         }

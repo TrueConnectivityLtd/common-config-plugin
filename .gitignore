@@ -13,6 +13,9 @@ project/boot/
 project/plugins/project/
 publishSettings.sbt
 
+# git specific
+.git-credential
+
 # Scala-IDE specific
 .scala_dependencies
 .worksheet
