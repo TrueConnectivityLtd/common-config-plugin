@@ -34,8 +34,8 @@ object CommonConfigPlugin extends AutoPlugin {
 
     //Running scalastyle automatically on both compile and test
     lazy val settings = ScalastylePlugin.projectSettings ++ Seq(
-      testScalastyle := scalastyle.in(Test).toTask("").value,
-      compileScalastyle := scalastyle.in(Compile).toTask("").value,
+      testScalastyle in ThisBuild := scalastyle.in(Test).toTask("").value,
+      compileScalastyle in ThisBuild := scalastyle.in(Compile).toTask("").value,
       (test in Test) := ((test in Test) dependsOn testScalastyle).value,
       (compile in Compile) := ((compile in Compile) dependsOn compileScalastyle).value
     )
@@ -48,7 +48,7 @@ object CommonConfigPlugin extends AutoPlugin {
   object CommonDependencies {
     val slf4j_version = "1.6.1"
     lazy val settings = Seq[Setting[_]](
-      libraryDependencies ++= Seq(
+      libraryDependencies in ThisBuild ++= Seq(
         "org.slf4j"    % "slf4j-api" % slf4j_version,
         "com.typesafe" % "config"    % "1.3.0"
       )
@@ -93,14 +93,14 @@ object CommonConfigPlugin extends AutoPlugin {
           IO.readBytes(getClass.getClassLoader().getResourceAsStream(styleConfFile))
         )
       },
-      validate := Def
+      validate in ThisBuild := Def
         .sequential(
           (scalastyle in Compile).toTask(""),
           scalafmtCheckAll,
           scalafmtSbtCheck in Compile
         )
         .value,
-      format := Def
+      format in ThisBuild := Def
         .sequential(
           scalafmtAll,
           scalafmtSbt in Compile
@@ -126,7 +126,7 @@ object CommonConfigPlugin extends AutoPlugin {
       )
 
     lazy val trueconnectivityCommonSettings: Seq[Def.Setting[_]] = Seq(
-      organization := "com.trueconnectivity",
+      organization in ThisBuild := "com.trueconnectivity",
       scalaVersion := "2.12.10"
     ) ++
       Revolver.settings ++
