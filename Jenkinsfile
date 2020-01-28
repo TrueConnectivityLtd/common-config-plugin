@@ -7,18 +7,6 @@ private boolean lastCommitIsBumpCommit() {
     }
 }
 
-node {
-    checkout([
-        $class: 'GitSCM',
-        branches: scm.branches,
-        doGenerateSubmoduleConfigurations: scm.doGenerateSubmoduleConfigurations,
-        extensions: scm.extensions + [
-            [$class: 'UserExclusion', excludedUsers: 'trueconnectivity-build']
-        ],
-        userRemoteConfigs: scm.userRemoteConfigs
-    ])
-}
-
 pipeline {
     agent any
 
