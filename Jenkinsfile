@@ -1,4 +1,6 @@
-private boolean lastCommitIsBumpCommit() {
+@Library('utils') _
+
+private boolean isBumpCommit() {
     lastCommit = sh([script: 'git log -1', returnStdout: true])
     if (lastCommit.contains("Setting version to")) {
         return true
@@ -20,8 +22,10 @@ pipeline {
         stage('Checkout') {
            steps { 
             checkout scm
+            abortPipelineWithPublishedVersion()
+
             script {
-                if (lastCommitIsBumpCommit()) {
+                if (isBumpCommit()) {
                     currentBuild.result = 'ABORTED'
                     error('Last commit bumped the version, aborting the build to prevent a loop.')
                 }
