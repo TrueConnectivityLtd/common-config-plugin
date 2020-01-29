@@ -16,6 +16,7 @@ pipeline {
         SBT_HOME = tool name: 'sbt-1.1.4', type: 'org.jvnet.hudson.plugins.SbtPluginBuilder$SbtInstallation'
         PATH = "${env.SBT_HOME}/bin:${env.PATH}"
         ARTIFACTORY = credentials('artifactory-build')
+        GIT_CREDENTIALS_FILE = '.git-credentials'
     }
 
     stages {
@@ -34,9 +35,7 @@ pipeline {
         }
         stage('Build & Test') {
             steps {
-                sh '''
-                    sbt test
-                '''
+                sh 'sbt test'
             }
         }
         stage('Publish Snapshot') {
@@ -56,15 +55,8 @@ pipeline {
                 GITHUB = credentials('abff7286-8319-4696-be99-fcd161ffd78f')
             }
             steps {
+                setupReleaseGithubUser username: "${GITHUB_USR}", password: "${GITHUB_PSW}", branch: "${BRANCH_NAME}", credentialsFile: "${GIT_CREDENTIALS_FILE}"
                 sh '''
-                    git checkout ${BRANCH_NAME}
-                    git pull --force
-                    echo "https://${GITHUB_USR}:${GITHUB_PSW}@github.com"> .git-credentials
-                    git config --local credential.username $GITHUB_USR
-                    git config --local credential.helper 'store --file=.git-credentials'
-                    git config remote.origin.fetch +refs/heads/*:refs/remotes/origin/*
-                    git config branch.${BRANCH_NAME}.remote origin
-                    git config branch.${BRANCH_NAME}.merge refs/heads/${BRANCH_NAME}
                     sbt "release with-defaults"
                 '''
             }
@@ -75,7 +67,7 @@ pipeline {
         always {
             script {
                 sh '''
-                  rm -f .git-credentials
+                  rm -f ${GIT_CREDENTIALS_FILE}
                 '''
             }
         }
