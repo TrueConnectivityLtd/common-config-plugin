@@ -25,12 +25,7 @@ pipeline {
         stage('Publish Snapshot') {
             when { not { branch 'develop' } }
             steps {
-                sh '''
-                    branch_quoted="${BRANCH_NAME/\\//}"
-                    BUILD_VERSION=$BUILD_NUMBER-$branch_quoted
-                    sed -i -e "s/\\"$/.$BUILD_VERSION\\"/" version.sbt 
-                    sbt publish
-                '''
+                sbtPublishSnapshot()
             } 
         }
         stage('Publish') {
