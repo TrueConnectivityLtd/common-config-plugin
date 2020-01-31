@@ -8,7 +8,6 @@ pipeline {
         SBT_HOME = tool name: 'sbt-1.1.4', type: 'org.jvnet.hudson.plugins.SbtPluginBuilder$SbtInstallation'
         PATH = "${env.SBT_HOME}/bin:${env.PATH}"
         ARTIFACTORY = credentials('artifactory-build')
-        CREDENTIALS_FILE = "${Constants.GIT_CREDENTIALS_FILE}"
     }
 
     stages {
@@ -39,9 +38,9 @@ pipeline {
     post {
         always {
             script {
-                sh '''
-                    rm -f $CREDENTIALS_FILE
-                '''
+                sh """
+                    rm -f ${Constants.GIT_CREDENTIALS_FILE}
+                """
             }
         }
     }
