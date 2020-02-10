@@ -5,7 +5,7 @@ pipeline {
     agent any
 
     environment {
-        SBT_HOME = tool name: 'sbt-1.1.4', type: 'org.jvnet.hudson.plugins.SbtPluginBuilder$SbtInstallation'
+        SBT_HOME = tool name: 'sbt-1', type: 'org.jvnet.hudson.plugins.SbtPluginBuilder$SbtInstallation'
         PATH = "${env.SBT_HOME}/bin:${env.PATH}"
         ARTIFACTORY = credentials('artifactory-build')
     }
