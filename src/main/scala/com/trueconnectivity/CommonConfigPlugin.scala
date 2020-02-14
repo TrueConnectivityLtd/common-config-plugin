@@ -97,7 +97,8 @@ object CommonConfigPlugin extends AutoPlugin {
         .sequential(
           (scalastyle in Compile).toTask(""),
           scalafmtCheckAll,
-          scalafmtSbtCheck in Compile
+          scalafmtSbtCheck in Compile,
+          test
         )
         .value,
       format in ThisBuild := Def
