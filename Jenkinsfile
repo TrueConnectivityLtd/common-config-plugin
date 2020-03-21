@@ -28,7 +28,7 @@ pipeline {
             } 
         }
         stage('Publish') {
-            when { branch 'develop' }
+            when { branch 'master' }
             steps {
                 sbtPublishRelease()
             }
