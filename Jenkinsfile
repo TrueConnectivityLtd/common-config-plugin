@@ -22,7 +22,7 @@ pipeline {
             }
         }
         stage('Publish Snapshot') {
-            when { not { branch 'develop' } }
+            when { not { branch 'master' } }
             steps {
                 sbtPublishSnapshot()
             } 
