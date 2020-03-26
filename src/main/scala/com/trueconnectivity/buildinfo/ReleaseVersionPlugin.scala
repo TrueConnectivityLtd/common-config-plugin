@@ -18,14 +18,18 @@ object ReleaseVersionPlugin extends AutoPlugin {
   override def requires: Plugins = BuildInfoPlugin
 
   override def projectSettings: Seq[Def.Setting[_]] = Seq(
-    releaseVersion := Seq(
-      Some(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))),
-      gitHeadCommit.value.map(_.take(GIT_SHORT_HASH_LENGTH)),
-      Some(gitCurrentBranch.value.filter(_.isLetterOrDigit)),
-      if (gitUncommittedChanges.value) Some("SNAPSHOT") else None
-    ).collect {
-      case Some(segment) => segment
-    }.mkString("-"),
+    releaseVersion := {
+      // Jenkins checks out specific commit, so branch returns commit SHA in that case - use EnvVar in Jenkins
+      val branchName = Option(System.getenv("BRANCH_NAME")).getOrElse(gitCurrentBranch.value)
+      Seq(
+        Some(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))),
+        gitHeadCommit.value.map(_.take(GIT_SHORT_HASH_LENGTH)),
+        Some(branchName.filter(_.isLetterOrDigit)),
+        if (gitUncommittedChanges.value) Some("SNAPSHOT") else None
+      ).collect {
+        case Some(segment) => segment
+      }.mkString("-")
+    },
 
     buildInfoPackage := "com.trueconnectivity.build",
     buildInfoKeys := Seq[BuildInfoKey](releaseVersion, scalaVersion),
