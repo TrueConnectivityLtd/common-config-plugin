@@ -18,7 +18,7 @@ object ReleaseVersionPlugin extends AutoPlugin {
   override def requires: Plugins = BuildInfoPlugin
 
   override def projectSettings: Seq[Def.Setting[_]] = Seq(
-    releaseVersion := {
+    appReleaseVersion := {
       // Jenkins checks out specific commit, so branch returns commit SHA in that case - use EnvVar in Jenkins
       val branchName = Option(System.getenv("BRANCH_NAME")).getOrElse(gitCurrentBranch.value)
       Seq(
@@ -32,16 +32,16 @@ object ReleaseVersionPlugin extends AutoPlugin {
     },
 
     buildInfoPackage := "com.trueconnectivity.build",
-    buildInfoKeys := Seq[BuildInfoKey](releaseVersion, scalaVersion),
+    buildInfoKeys := Seq[BuildInfoKey](appReleaseVersion, scalaVersion),
     buildInfoOptions += BuildInfoOption.ToMap,
 
-    releaseVersionFile := {
+    appReleaseVersionFile := {
       val targetFile = baseDirectory.value / ".release_version"
-      IO.write(targetFile, releaseVersion.value.getBytes(StandardCharsets.UTF_8))
+      IO.write(targetFile, appReleaseVersion.value.getBytes(StandardCharsets.UTF_8))
       targetFile
     },
 
-    (Compile / resourceGenerators) += releaseVersionFile.taskValue.map(Seq(_))
+    (Compile / resourceGenerators) += appReleaseVersionFile.taskValue.map(Seq(_))
   )
 
 }
