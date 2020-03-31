@@ -10,8 +10,6 @@ package com.trueconnectivity
 
 import sbt.Keys._
 import sbt._
-import scoverage.ScoverageKeys
-import scala.util.Try
 
 object CommonConfigPlugin extends AutoPlugin {
 
@@ -98,7 +96,7 @@ object CommonConfigPlugin extends AutoPlugin {
           (scalastyle in Compile).toTask(""),
           scalafmtCheckAll,
           scalafmtSbtCheck in Compile,
-          test
+          Test / test
         )
         .value,
       format in ThisBuild := Def
