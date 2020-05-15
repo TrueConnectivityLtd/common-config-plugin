@@ -27,11 +27,13 @@ object CommonConfigPlugin extends AutoPlugin {
 
   object CommonScalastyle {
 
+    lazy val integrationTestScalastyle    = taskKey[Unit]("integrationTestScalastyle")
     lazy val testScalastyle    = taskKey[Unit]("testScalastyle")
     lazy val compileScalastyle = taskKey[Unit]("compileScalastyle")
 
     //Running scalastyle automatically on both compile and test
     lazy val settings = ScalastylePlugin.projectSettings ++ Seq(
+      integrationTestScalastyle in ThisBuild := scalastyle.in(IntegrationTest).toTask("").value,
       testScalastyle in ThisBuild := scalastyle.in(Test).toTask("").value,
       compileScalastyle in ThisBuild := scalastyle.in(Compile).toTask("").value,
       (test in Test) := ((test in Test) dependsOn testScalastyle).value,
