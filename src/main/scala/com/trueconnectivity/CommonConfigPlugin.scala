@@ -27,19 +27,27 @@ object CommonConfigPlugin extends AutoPlugin {
 
   object CommonScalastyle {
 
-    lazy val integrationTestScalastyle    = taskKey[Unit]("integrationTestScalastyle")
-    lazy val testScalastyle    = taskKey[Unit]("testScalastyle")
-    lazy val compileScalastyle = taskKey[Unit]("compileScalastyle")
+    lazy val integrationTestScalastyle = taskKey[Unit]("integrationTestScalastyle")
+    lazy val testScalastyle            = taskKey[Unit]("testScalastyle")
+    lazy val compileScalastyle         = taskKey[Unit]("compileScalastyle")
 
-    //Running scalastyle automatically on both compile and test
+    lazy val integrationTestSettings = if (project.configurations.contains(IntegrationTest)) {
+      Seq(
+        integrationTestScalastyle in ThisBuild := scalastyle.in(IntegrationTest).toTask("").value,
+        (compile in IntegrationTest) := ((compile in IntegrationTest) dependsOn integrationTestScalastyle).value
+      )
+    } else {
+      Nil
+    }
+
     lazy val settings = ScalastylePlugin.projectSettings ++ Seq(
-      integrationTestScalastyle in ThisBuild := scalastyle.in(IntegrationTest).toTask("").value,
-      testScalastyle in ThisBuild := scalastyle.in(Test).toTask("").value,
-      compileScalastyle in ThisBuild := scalastyle.in(Compile).toTask("").value,
-      (test in Test) := ((test in Test) dependsOn testScalastyle).value,
-      (compile in Compile) := ((compile in Compile) dependsOn compileScalastyle).value
-    )
+        testScalastyle in ThisBuild := scalastyle.in(Test).toTask("").value,
+        compileScalastyle in ThisBuild := scalastyle.in(Compile).toTask("").value,
+        (test in Test) := ((test in Test) dependsOn testScalastyle).value,
+        (compile in Compile) := ((compile in Compile) dependsOn compileScalastyle).value
+      ) ++ integrationTestSettings
   }
+
 
   object CommonScoverage {
     lazy val settings = ScoverageSbtPlugin.projectSettings

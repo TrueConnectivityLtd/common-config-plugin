@@ -28,7 +28,11 @@ object E2eTestPlugin extends AutoPlugin {
         .value
         .getAbsolutePath,
       testCasesPackageTask := {
-        HealthCheck.waitUntilHealthy(dockerConnectPort.value, dockerConnectRetryCount.value, dockerConnectRetryDelayMs.value)
+        HealthCheck.waitUntilHealthy(
+          dockerConnectPort.value,
+          dockerConnectRetryCount.value,
+          dockerConnectRetryDelayMs.value
+        )
 
         (sbt.Keys.packageBin in IntegrationTest).value
       },
