@@ -46,6 +46,10 @@ addSbtPlugin("com.typesafe.sbt" % "sbt-git" % "1.0.0")
 
 addSbtPlugin("com.eed3si9n" % "sbt-buildinfo" % "0.9.0")
 
+addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "1.5.2")
+
+addSbtPlugin("com.tapad" % "sbt-docker-compose" % "1.0.35")
+
 publishMavenStyle := true
 publishArtifact in Test := false
 pomIncludeRepository := { _ =>
@@ -53,5 +57,7 @@ pomIncludeRepository := { _ =>
 }
 
 addCommandAlias("format", "; scalafmt ; test:scalafmt ; scalafmtSbt")
+
+libraryDependencies += "org.scalaj" %% "scalaj-http" % "2.4.2"
 
 //Potential other plugins to add : unidoc
