@@ -28,7 +28,11 @@ object E2eTestPlugin extends AutoPlugin {
         .value
         .getAbsolutePath,
       testCasesPackageTask := {
-        HealthCheck.waitUntilHealthy(dockerConnectPort.value, dockerConnectRetryCount.value, dockerConnectRetryDelayMs.value)
+        HealthCheck.waitUntilHealthy(
+          e2eConnectPort.value,
+          e2eConnectRetryCount.value,
+          e2eConnectRetryDelayMs.value
+        )
 
         (sbt.Keys.packageBin in IntegrationTest).value
       },
@@ -45,8 +49,8 @@ object E2eTestPlugin extends AutoPlugin {
   }
 
   override lazy val projectSettings: Seq[Setting[_]] = Seq(
-    dockerConnectRetryCount := 10,
-    dockerConnectRetryDelayMs := 4000,
+    e2eConnectRetryCount := 10,
+    e2eConnectRetryDelayMs := 4000,
   ) ++ Defaults.itSettings ++ DockerComposePlugin.projectSettings ++ E2eConfig.settings
 
   override lazy val buildSettings: Seq[Setting[_]] = Seq()
