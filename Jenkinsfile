@@ -2,7 +2,7 @@
 import com.trueconnectivity.internal.Constants
 
 pipeline {
-    agent any
+    agent { label 'java11' }
 
     environment {
         SBT_HOME = tool name: 'sbt-1', type: 'org.jvnet.hudson.plugins.SbtPluginBuilder$SbtInstallation'
