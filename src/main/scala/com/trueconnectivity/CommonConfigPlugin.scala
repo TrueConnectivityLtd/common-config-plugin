@@ -75,6 +75,7 @@ object CommonConfigPlugin extends AutoPlugin {
         "-Ywarn-dead-code",
         "-Ywarn-adapted-args",
         "-Ywarn-inaccessible",
+        "-Ywarn-unused",
         "-unchecked"
       ),
       scalacOptions in Test ++= Seq(
