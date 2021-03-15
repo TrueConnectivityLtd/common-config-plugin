@@ -37,6 +37,7 @@ object E2eTestPlugin extends AutoPlugin {
         (sbt.Keys.packageBin in IntegrationTest).value
       },
       testDependenciesClasspath := (
+          (fullClasspath in Compile).value.files ++
           (managedClasspath in IntegrationTest).value.files ++
           (unmanagedClasspath in IntegrationTest).value.files ++
           (resources in IntegrationTest).value ++
