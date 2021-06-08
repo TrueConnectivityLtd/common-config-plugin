@@ -13,7 +13,7 @@ sbtPlugin := true
 enablePlugins(SbtPlugin)
 
 ivyLoggingLevel := UpdateLogging.Quiet
-scalacOptions in Compile ++= Seq("-feature", "-deprecation")
+Compile / scalacOptions ++= Seq("-feature", "-deprecation")
 
 releaseVersionBump := sbtrelease.Version.Bump.Bugfix
 
@@ -25,33 +25,29 @@ resolvers ++= Seq(
   Resolver.sonatypeRepo("releases"),
   Resolver.typesafeRepo("releases"),
   Resolver.typesafeRepo("snapshots"),
-  Resolver.sonatypeRepo("snapshots"),
-  "spray repo" at "http://repo.spray.io",
-  "jgit-repo" at "http://download.eclipse.org/jgit/maven"
+  Resolver.sonatypeRepo("snapshots")
 )
 
-addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.14.10")
+addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.15.0")
 
-addSbtPlugin("io.spray" % "sbt-revolver" % "0.9.0")
+addSbtPlugin("io.spray" % "sbt-revolver" % "0.9.1")
 
-addSbtPlugin("net.virtual-void" % "sbt-dependency-graph" % "0.10.0-RC1")
-
-addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.6.1")
+addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.8.2")
 
 addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "1.0.0")
 
-addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.2.1")
+addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.4.2")
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-git" % "1.0.0")
 
 addSbtPlugin("com.eed3si9n" % "sbt-buildinfo" % "0.9.0")
 
-addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "1.5.2")
+addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "1.7.6")
 
 addSbtPlugin("com.tapad" % "sbt-docker-compose" % "1.0.35")
 
 publishMavenStyle := true
-publishArtifact in Test := false
+Test / publishArtifact := false
 pomIncludeRepository := { _ =>
   false
 }
