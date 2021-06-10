@@ -13,13 +13,13 @@ import sbt._
 
 object CommonConfigPlugin extends AutoPlugin {
 
-  import spray.revolver.RevolverPlugin.autoImport._
   import com.typesafe.sbt.GitPlugin
-  import scoverage.ScoverageSbtPlugin
   import org.scalastyle.sbt.ScalastylePlugin
   import ScalastylePlugin.autoImport._
   import org.scalafmt.sbt.ScalafmtPlugin
   import ScalafmtPlugin.autoImport._
+  import scoverage.ScoverageSbtPlugin
+  import spray.revolver.RevolverPlugin.autoImport._
 
   override def requires: Plugins = empty
 
@@ -33,18 +33,18 @@ object CommonConfigPlugin extends AutoPlugin {
 
     lazy val integrationTestSettings = if (project.configurations.contains(IntegrationTest)) {
       Seq(
-        integrationTestScalastyle in ThisBuild := scalastyle.in(IntegrationTest).toTask("").value,
-        (compile in IntegrationTest) := ((compile in IntegrationTest) dependsOn integrationTestScalastyle).value
+        ThisBuild / integrationTestScalastyle := (IntegrationTest / scalastyle).toTask("").value,
+        (IntegrationTest / compile) := ((IntegrationTest / compile) dependsOn integrationTestScalastyle).value
       )
     } else {
       Nil
     }
 
     lazy val settings = ScalastylePlugin.projectSettings ++ Seq(
-        testScalastyle in ThisBuild := scalastyle.in(Test).toTask("").value,
-        compileScalastyle in ThisBuild := scalastyle.in(Compile).toTask("").value,
-        (test in Test) := ((test in Test) dependsOn testScalastyle).value,
-        (compile in Compile) := ((compile in Compile) dependsOn compileScalastyle).value
+      ThisBuild / testScalastyle := (Test / scalastyle).toTask("").value,
+      ThisBuild / compileScalastyle := (Compile / scalastyle).toTask("").value,
+        (Test / test) := ((Test / test) dependsOn testScalastyle).value,
+        (Compile / compile) := ((Compile / compile) dependsOn compileScalastyle).value
       ) ++ integrationTestSettings
   }
 
@@ -56,9 +56,9 @@ object CommonConfigPlugin extends AutoPlugin {
   object CommonDependencies {
     val slf4j_version = "1.6.1"
     lazy val settings = Seq[Setting[_]](
-      libraryDependencies in ThisBuild ++= Seq(
+      ThisBuild / libraryDependencies ++= Seq(
         "org.slf4j"    % "slf4j-api" % slf4j_version,
-        "com.typesafe" % "config"    % "1.3.0"
+        "com.typesafe" % "config"    % "1.4.1"
       )
     )
   }
@@ -78,7 +78,7 @@ object CommonConfigPlugin extends AutoPlugin {
         "-Ywarn-unused",
         "-unchecked"
       ),
-      scalacOptions in Test ++= Seq(
+      Test / scalacOptions ++= Seq(
         "-language:reflectiveCalls"
       )
     )
@@ -95,25 +95,25 @@ object CommonConfigPlugin extends AutoPlugin {
       generateConfigs := {
         IO.write(
           file(s".$sfmtConfFile"),
-          IO.readBytes(getClass.getClassLoader().getResourceAsStream(sfmtConfFile))
+          IO.readBytes(getClass.getClassLoader.getResourceAsStream(sfmtConfFile))
         )
         IO.write(
           file(styleConfFile),
-          IO.readBytes(getClass.getClassLoader().getResourceAsStream(styleConfFile))
+          IO.readBytes(getClass.getClassLoader.getResourceAsStream(styleConfFile))
         )
       },
-      validate in ThisBuild := Def
+      ThisBuild / validate := Def
         .sequential(
-          (scalastyle in Compile).toTask(""),
+          (Compile / scalastyle).toTask(""),
           scalafmtCheckAll,
-          scalafmtSbtCheck in Compile,
+          Compile / scalafmtSbtCheck,
           Test / test
         )
         .value,
-      format in ThisBuild := Def
+      ThisBuild / format := Def
         .sequential(
           scalafmtAll,
-          scalafmtSbt in Compile
+          Compile / scalafmtSbt
         )
         .value
     )
@@ -136,15 +136,14 @@ object CommonConfigPlugin extends AutoPlugin {
       )
 
     lazy val trueconnectivityCommonSettings: Seq[Def.Setting[_]] = Seq(
-      organization in ThisBuild := "com.trueconnectivity",
-      scalaVersion := "2.12.10"
+      ThisBuild / organization := "com.trueconnectivity",
+      scalaVersion := "2.13.6"
     ) ++
       Revolver.settings ++
       CommonScalastyle.settings ++
       CommonDependencies.settings ++
       CommonCompile.settings ++
       CommonScoverage.settings ++
-      net.virtualvoid.sbt.graph.DependencyGraphPlugin.projectSettings ++
       GitPlugin.projectSettings
   }
 

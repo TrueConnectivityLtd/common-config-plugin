@@ -1,12 +1,12 @@
 package com.trueconnectivity.e2e
 
 import com.tapad.docker.DockerComposePlugin
-import com.typesafe.sbt.packager.docker.DockerPlugin
-import sbt._
-import Keys._
-import java.io.File
-
 import com.trueconnectivity.e2e.utils.HealthCheck
+import com.typesafe.sbt.packager.docker.DockerPlugin
+import sbt.Keys._
+import sbt._
+
+import java.io.File
 
 object E2eTestPlugin extends AutoPlugin {
   override val requires: Plugins = DockerPlugin
@@ -23,8 +23,7 @@ object E2eTestPlugin extends AutoPlugin {
     import DockerComposePlugin.autoImport._
 
     lazy val settings: Seq[Setting[_]] = Seq(
-      testCasesJar := artifactPath
-        .in(IntegrationTest, packageBin)
+      testCasesJar := (IntegrationTest / packageBin / artifactPath)
         .value
         .getAbsolutePath,
       testCasesPackageTask := {
@@ -34,18 +33,18 @@ object E2eTestPlugin extends AutoPlugin {
           e2eConnectRetryDelayMs.value
         )
 
-        (sbt.Keys.packageBin in IntegrationTest).value
+        (IntegrationTest / sbt.Keys.packageBin).value
       },
       testDependenciesClasspath := (
-          (fullClasspath in Compile).value.files ++
-          (managedClasspath in IntegrationTest).value.files ++
-          (unmanagedClasspath in IntegrationTest).value.files ++
-          (resources in IntegrationTest).value ++
-          Seq((classDirectory in IntegrationTest).value)
+          (Compile / fullClasspath).value.files ++
+          (IntegrationTest / managedClasspath).value.files ++
+          (IntegrationTest / unmanagedClasspath).value.files ++
+          (IntegrationTest / resources).value ++
+          Seq((IntegrationTest / classDirectory).value)
         )
         .map(_.getAbsoluteFile)
         .mkString(File.pathSeparator),
-      dockerImageCreationTask := (publishLocal in DockerPlugin.autoImport.Docker).value
+      dockerImageCreationTask := (DockerPlugin.autoImport.Docker / publishLocal).value
     )
   }
 
