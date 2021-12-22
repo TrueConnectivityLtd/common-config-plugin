@@ -71,10 +71,7 @@ object CommonConfigPlugin extends AutoPlugin {
         "-language:higherKinds",
         "-language:existentials",
         "-language:postfixOps",
-        "-Ywarn-adapted-args",
         "-Ywarn-dead-code",
-        "-Ywarn-adapted-args",
-        "-Ywarn-inaccessible",
         "-Ywarn-unused",
         "-unchecked"
       ),
@@ -137,7 +134,7 @@ object CommonConfigPlugin extends AutoPlugin {
 
     lazy val trueconnectivityCommonSettings: Seq[Def.Setting[_]] = Seq(
       ThisBuild / organization := "com.trueconnectivity",
-      scalaVersion := "2.12.14"
+      scalaVersion := "2.13.7"
     ) ++
       Revolver.settings ++
       CommonScalastyle.settings ++
