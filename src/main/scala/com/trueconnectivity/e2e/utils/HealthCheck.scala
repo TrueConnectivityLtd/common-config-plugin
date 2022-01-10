@@ -5,9 +5,16 @@ import scalaj.http.{Http, HttpResponse}
 import scala.util.{Failure, Success, Try}
 
 object HealthCheck {
-  def waitUntilHealthy(applicationPort: Int, retryCount: Int, retryDelay: Int): Unit = {
+  def waitUntilHealthy(
+      applicationName: String,
+      applicationPort: Int,
+      retryCount: Int,
+      retryDelay: Int
+  ): Unit = {
+    val port = System.getProperties.getOrDefault(s"${applicationName}:${applicationPort}", "8080")
+
     retry(retryCount, retryDelay) {
-      Http(s"http://localhost:${applicationPort}/health/status")
+      Http(s"http://localhost:${port}/health/status")
         .timeout(connTimeoutMs = 500, readTimeoutMs = 1000)
         .asString
     }
@@ -17,8 +24,8 @@ object HealthCheck {
 
     @annotation.tailrec
     def attemptConnection(
-      count: Int = 0,
-      msg: String = "Attempting connection "
+        count: Int = 0,
+        msg: String = "Attempting connection "
     ): Try[HttpResponse[String]] = {
       println(msg)
       if (count >= retryCount) {
