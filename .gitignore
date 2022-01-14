@@ -22,3 +22,5 @@ publishSettings.sbt
 
 # Intellij-Idea specific
 .idea
+
+.bsp
