@@ -108,13 +108,13 @@ object CommonConfigPlugin extends AutoPlugin {
           scalafmtCheckAll,
           Compile / scalafmtSbtCheck,
           Test / test
-        )
+        ).all(ScopeFilter(inAnyProject))
         .value,
       ThisBuild / format := Def
         .sequential(
           scalafmtAll,
           Compile / scalafmtSbt
-        )
+        ).all(ScopeFilter(inAnyProject))
         .value
     )
   }
