@@ -31,31 +31,31 @@ object CommonConfigPlugin extends AutoPlugin {
     lazy val testScalastyle            = taskKey[Unit]("testScalastyle")
     lazy val compileScalastyle         = taskKey[Unit]("compileScalastyle")
 
-    lazy val integrationTestSettings = if (project.configurations.contains(IntegrationTest)) {
-      Seq(
-        ThisBuild / integrationTestScalastyle := (IntegrationTest / scalastyle).toTask("").value,
-        (IntegrationTest / compile) := ((IntegrationTest / compile) dependsOn integrationTestScalastyle).value
-      )
-    } else {
-      Nil
-    }
+    private lazy val integrationTestSettings =
+      if (project.configurations.contains(IntegrationTest)) {
+        Seq(
+          ThisBuild / integrationTestScalastyle := (IntegrationTest / scalastyle).toTask("").value,
+          (IntegrationTest / compile) := ((IntegrationTest / compile) dependsOn integrationTestScalastyle).value
+        )
+      } else {
+        Nil
+      }
 
-    lazy val settings = ScalastylePlugin.projectSettings ++ Seq(
+    lazy val settings: Seq[Def.Setting[_]] = ScalastylePlugin.projectSettings ++ Seq(
       ThisBuild / testScalastyle := (Test / scalastyle).toTask("").value,
       ThisBuild / compileScalastyle := (Compile / scalastyle).toTask("").value,
-        (Test / test) := ((Test / test) dependsOn testScalastyle).value,
-        (Compile / compile) := ((Compile / compile) dependsOn compileScalastyle).value
-      ) ++ integrationTestSettings
+      (Test / test) := ((Test / test) dependsOn testScalastyle).value,
+      (Compile / compile) := ((Compile / compile) dependsOn compileScalastyle).value
+    ) ++ integrationTestSettings
   }
 
-
   object CommonScoverage {
-    lazy val settings = ScoverageSbtPlugin.projectSettings
+    lazy val settings: Seq[sbt.Setting[_]] = ScoverageSbtPlugin.projectSettings
   }
 
   object CommonDependencies {
-    val slf4j_version = "1.6.1"
-    lazy val settings = Seq[Setting[_]](
+    val slf4j_version = "1.7.33"
+    lazy val settings: Seq[sbt.Setting[_]] = Seq[Setting[_]](
       ThisBuild / libraryDependencies ++= Seq(
         "org.slf4j"    % "slf4j-api" % slf4j_version,
         "com.typesafe" % "config"    % "1.4.1"
@@ -64,7 +64,7 @@ object CommonConfigPlugin extends AutoPlugin {
   }
 
   object CommonCompile {
-    lazy val settings = Seq[Setting[_]](
+    lazy val settings: Seq[sbt.Setting[_]] = Seq[Setting[_]](
       scalacOptions ++= Seq(
         "-deprecation",
         "-feature",
@@ -91,7 +91,7 @@ object CommonConfigPlugin extends AutoPlugin {
     private val sfmtConfFile  = "scalafmt.conf"
     private val styleConfFile = "scalastyle-config.xml"
 
-    lazy val formattingTasksSettings = Seq[Setting[_]](
+    lazy val formattingTasksSettings: Seq[sbt.Setting[_]] = Seq[Setting[_]](
       generateConfigs := {
         IO.write(
           file(s".$sfmtConfFile"),
@@ -108,13 +108,15 @@ object CommonConfigPlugin extends AutoPlugin {
           scalafmtCheckAll,
           Compile / scalafmtSbtCheck,
           Test / test
-        ).all(ScopeFilter(inAnyProject))
+        )
+        .all(ScopeFilter(inAnyProject))
         .value,
       ThisBuild / format := Def
         .sequential(
           scalafmtAll,
           Compile / scalafmtSbt
-        ).all(ScopeFilter(inAnyProject))
+        )
+        .all(ScopeFilter(inAnyProject))
         .value
     )
   }
@@ -137,7 +139,7 @@ object CommonConfigPlugin extends AutoPlugin {
 
     lazy val trueconnectivityCommonSettings: Seq[Def.Setting[_]] = Seq(
       ThisBuild / organization := "com.trueconnectivity",
-      scalaVersion := "2.12.14"
+      scalaVersion := "2.12.15"
     ) ++
       Revolver.settings ++
       CommonScalastyle.settings ++
@@ -150,9 +152,9 @@ object CommonConfigPlugin extends AutoPlugin {
   // a group of settings that are automatically added to projects.
   import autoImport._
 
-  override val projectSettings = Seq(Compile, Test).flatMap(
+  override val projectSettings: Seq[Def.Setting[_]] = Seq(Compile, Test).flatMap(
     inConfig(_)(trueconnectivityCommonSettings)
   ) ++ CommonScalaFmt.formattingTasksSettings
 
-  override val buildSettings = GitPlugin.buildSettings
+  override val buildSettings: Seq[sbt.Setting[_]] = GitPlugin.buildSettings
 }

@@ -10,6 +10,8 @@ name := "common-config-plugin"
 
 sbtPlugin := true
 
+scalaVersion := "2.12.15"
+
 enablePlugins(SbtPlugin)
 
 ivyLoggingLevel := UpdateLogging.Quiet
@@ -28,21 +30,21 @@ resolvers ++= Seq(
   Resolver.sonatypeRepo("snapshots")
 )
 
-addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.15.0")
+addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "1.1.0")
 
 addSbtPlugin("io.spray" % "sbt-revolver" % "0.9.1")
 
-addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.8.2")
+addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.9.3")
 
 addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "1.0.0")
 
-addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.4.2")
+addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.4.6")
 
-addSbtPlugin("com.typesafe.sbt" % "sbt-git" % "1.0.0")
+addSbtPlugin("com.typesafe.sbt" % "sbt-git" % "1.0.2")
 
-addSbtPlugin("com.eed3si9n" % "sbt-buildinfo" % "0.9.0")
+addSbtPlugin("com.eed3si9n" % "sbt-buildinfo" % "0.10.0")
 
-addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "1.7.6")
+addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "1.8.1")
 
 addSbtPlugin("com.trueconnectivity" % "sbt-docker-compose" % "1.0.38")
 
