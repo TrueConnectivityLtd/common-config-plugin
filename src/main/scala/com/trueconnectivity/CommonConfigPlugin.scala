@@ -10,6 +10,7 @@ package com.trueconnectivity
 
 import sbt.Keys._
 import sbt._
+import scalafix.sbt.ScalafixPlugin.autoImport.scalafixDependencies
 
 object CommonConfigPlugin extends AutoPlugin {
 
@@ -54,12 +55,13 @@ object CommonConfigPlugin extends AutoPlugin {
   }
 
   object CommonDependencies {
-    val slf4j_version = "1.7.33"
+    val slf4j_version = "1.7.35"
     lazy val settings: Seq[sbt.Setting[_]] = Seq[Setting[_]](
       ThisBuild / libraryDependencies ++= Seq(
         "org.slf4j"    % "slf4j-api" % slf4j_version,
-        "com.typesafe" % "config"    % "1.4.1"
-      )
+        "com.typesafe" % "config"    % "1.4.2"
+      ),
+      ThisBuild / scalafixDependencies ++= Seq("com.github.liancheng" %% "organize-imports" % "0.6.0")
     )
   }
 
