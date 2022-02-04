@@ -48,6 +48,8 @@ addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "1.8.1")
 
 addSbtPlugin("com.trueconnectivity" % "sbt-docker-compose" % "1.0.38")
 
+addSbtPlugin("ch.epfl.scala" % "sbt-scalafix" % "0.9.34")
+
 publishMavenStyle := true
 Test / publishArtifact := false
 pomIncludeRepository := { _ =>
