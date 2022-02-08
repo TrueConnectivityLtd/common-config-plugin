@@ -69,7 +69,7 @@ object CommonConfigPlugin extends AutoPlugin {
 
   object CommonCompile {
     lazy val settings: Seq[sbt.Setting[_]] = Seq[Setting[_]](
-      scalacOptions :=Seq(
+      scalacOptions ++= Seq(
         "-deprecation",
         "-feature",
         "-language:higherKinds",
