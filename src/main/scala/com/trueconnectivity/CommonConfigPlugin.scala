@@ -61,7 +61,9 @@ object CommonConfigPlugin extends AutoPlugin {
         "org.slf4j"    % "slf4j-api" % slf4j_version,
         "com.typesafe" % "config"    % "1.4.2"
       ),
-      ThisBuild / scalafixDependencies ++= Seq("com.github.liancheng" %% "organize-imports" % "0.6.0")
+      ThisBuild / scalafixDependencies ++= Seq(
+        "com.github.liancheng" %% "organize-imports" % "0.6.0"
+      )
     )
   }
 
@@ -73,10 +75,7 @@ object CommonConfigPlugin extends AutoPlugin {
         "-language:higherKinds",
         "-language:existentials",
         "-language:postfixOps",
-        "-Ywarn-adapted-args",
         "-Ywarn-dead-code",
-        "-Ywarn-adapted-args",
-        "-Ywarn-inaccessible",
         "-Ywarn-unused",
         "-unchecked"
       ),

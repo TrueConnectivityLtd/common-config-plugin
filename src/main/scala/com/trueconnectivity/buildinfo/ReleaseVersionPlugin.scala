@@ -8,7 +8,13 @@ import sbt.{Def, _}
 import Keys._
 import com.trueconnectivity.buildinfo.ReleaseVersionKeys._
 import com.typesafe.sbt.SbtGit.GitKeys.{gitCurrentBranch, gitHeadCommit, gitUncommittedChanges}
-import sbtbuildinfo.BuildInfoPlugin.autoImport.{BuildInfoKey, BuildInfoOption, buildInfoKeys, buildInfoOptions, buildInfoPackage}
+import sbtbuildinfo.BuildInfoPlugin.autoImport.{
+  BuildInfoKey,
+  BuildInfoOption,
+  buildInfoKeys,
+  buildInfoOptions,
+  buildInfoPackage
+}
 import sbtbuildinfo._
 
 object ReleaseVersionPlugin extends AutoPlugin {
@@ -27,20 +33,18 @@ object ReleaseVersionPlugin extends AutoPlugin {
         Some(branchName.filter(_.isLetterOrDigit)),
         if (gitUncommittedChanges.value) Some("SNAPSHOT") else None
       ).collect {
-        case Some(segment) => segment
-      }.mkString("-")
+          case Some(segment) => segment
+        }
+        .mkString("-")
     },
-
     buildInfoPackage := "com.trueconnectivity.build",
     buildInfoKeys := Seq[BuildInfoKey](appReleaseVersion, scalaVersion),
     buildInfoOptions += BuildInfoOption.ToMap,
-
     appReleaseVersionFile := {
       val targetFile = baseDirectory.value / ".release_version"
       IO.write(targetFile, appReleaseVersion.value.getBytes(StandardCharsets.UTF_8))
       targetFile
     },
-
     (Compile / resourceGenerators) += appReleaseVersionFile.taskValue.map(Seq(_))
   )
 
