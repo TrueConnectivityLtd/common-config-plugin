@@ -32,10 +32,9 @@ object ReleaseVersionPlugin extends AutoPlugin {
         gitHeadCommit.value.map(_.take(GIT_SHORT_HASH_LENGTH)),
         Some(branchName.filter(_.isLetterOrDigit)),
         if (gitUncommittedChanges.value) Some("SNAPSHOT") else None
-      ).collect {
-          case Some(segment) => segment
-        }
-        .mkString("-")
+      ).collect { case Some(segment) =>
+        segment
+      }.mkString("-")
     },
     buildInfoPackage := "com.trueconnectivity.build",
     buildInfoKeys := Seq[BuildInfoKey](appReleaseVersion, scalaVersion),
