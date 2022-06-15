@@ -10,7 +10,7 @@ name := "common-config-plugin"
 
 sbtPlugin := true
 
-scalaVersion := "2.12.15"
+scalaVersion := "2.12.16"
 
 enablePlugins(SbtPlugin)
 
