@@ -140,7 +140,7 @@ object CommonConfigPlugin extends AutoPlugin {
 
     lazy val trueconnectivityCommonSettings: Seq[Def.Setting[_]] = Seq(
       ThisBuild / organization := "com.trueconnectivity",
-      scalaVersion := "2.12.15"
+      scalaVersion := "2.13.8"
     ) ++
       Revolver.settings ++
       CommonScalastyle.settings ++
