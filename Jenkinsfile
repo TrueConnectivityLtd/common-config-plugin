@@ -33,17 +33,17 @@ pipeline {
                 sbtPublishRelease()
             }
         }
-        stage('SonarQube Analysis') {
-            when { environment name: 'CHANGE_ID', value: '' } // when not in PR build
-            steps {
-                withSonarQubeEnv('Main') {
-                    script {
-                        sh 'sbt coverageReport'
-                        sh "${tool 'Scanner 4.3'}/bin/sonar-scanner -Dsonar.projectVersion=\$(cat version.sbt | cut -d '\"' -f2) -Dsonar.links.scm=${scm.getUserRemoteConfigs()[0].getUrl()} -Dsonar.links.ci=${env.BUILD_URL}"
-                    }
-                }
-            }
-        }
+//        stage('SonarQube Analysis') {
+//            when { environment name: 'CHANGE_ID', value: '' } // when not in PR build
+//            steps {
+//                withSonarQubeEnv('Main') {
+//                    script {
+//                        sh 'sbt coverageReport'
+//                        sh "${tool 'Scanner 4.3'}/bin/sonar-scanner -Dsonar.projectVersion=\$(cat version.sbt | cut -d '\"' -f2) -Dsonar.links.scm=${scm.getUserRemoteConfigs()[0].getUrl()} -Dsonar.links.ci=${env.BUILD_URL}"
+//                    }
+//                }
+//            }
+//        }
     }
 
     post {
