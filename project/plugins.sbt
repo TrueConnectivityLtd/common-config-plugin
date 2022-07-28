@@ -10,6 +10,6 @@ addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "1.0.0")
 // Release
 addSbtPlugin("com.github.sbt" % "sbt-release" % "1.1.0")
 
-addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.9.3")
+addSbtPlugin("org.scoverage" % "sbt-scoverage" % "2.0.1")
 
 libraryDependencies += "org.scala-sbt" %% "scripted-plugin" % sbtVersion.value
